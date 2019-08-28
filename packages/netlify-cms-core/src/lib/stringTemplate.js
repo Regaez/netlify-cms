@@ -28,7 +28,7 @@ function getExplicitFieldReplacement(key, data) {
     return;
   }
   const fieldName = key.substring(FIELD_PREFIX.length);
-  return data.get(fieldName, '');
+  return getDataByKey(fieldName, data);
 }
 
 export function parseDateFromEntry(entry, collection, fieldName) {
@@ -42,6 +42,13 @@ export function parseDateFromEntry(entry, collection, fieldName) {
   if (dateMoment && dateMoment.isValid()) {
     return dateMoment.toDate();
   }
+}
+
+export function getDataByKey(key, data) {
+  // Allows for retrieval of nested fields
+  return key.split('.').reduce((_data, _key) => {
+    return typeof _data === 'object' ? _data.get(_key) : '';
+  }, data);
 }
 
 export function compileStringTemplate(template, date, identifier = '', data = Map(), processor) {
@@ -65,7 +72,7 @@ export function compileStringTemplate(template, date, identifier = '', data = Ma
     } else if (key === 'slug') {
       replacement = identifier;
     } else {
-      replacement = data.get(key, '');
+      replacement = getDataByKey(key, data);
     }
 
     if (processor) {

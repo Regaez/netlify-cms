@@ -88,6 +88,7 @@ collections: # A list of collections the CMS should be able to edit
     label: 'Kitchen Sink'
     folder: '_sink'
     create: true
+    summary: "{{object.nested.text}}"
     fields:
       - label: 'Related Post'
         name: 'post'
@@ -135,6 +136,13 @@ collections: # A list of collections the CMS should be able to edit
           - { label: 'Image', name: 'image', widget: 'image' }
           - { label: 'File', name: 'file', widget: 'file' }
           - { label: 'Select', name: 'select', widget: 'select', options: ['a', 'b', 'c'] }
+          - label: 'Nested Object'
+            name: 'nested'
+            widget: 'object'
+            fields:
+              - label: 'Text'
+                name: 'text'
+                widget: 'string'
       - label: 'List'
         name: 'list'
         widget: 'list'
