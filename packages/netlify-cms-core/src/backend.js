@@ -30,6 +30,7 @@ import {
   extractTemplateVars,
   parseDateFromEntry,
   dateParsers,
+  getDataByKey,
 } from 'Lib/stringTemplate';
 
 export class LocalStorageAuthStore {
@@ -81,7 +82,7 @@ function getLabelForFileCollectionEntry(collection, path) {
 function slugFormatter(collection, entryData, slugConfig) {
   const template = collection.get('slug') || '{{slug}}';
 
-  const identifier = entryData.get(selectIdentifier(collection));
+  const identifier = getDataByKey(selectIdentifier(collection), entryData);
   if (!identifier) {
     throw new Error(
       'Collection must have a field name that is a valid entry identifier, or must have `identifier_field` set',

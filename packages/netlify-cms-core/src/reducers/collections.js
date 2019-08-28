@@ -1,4 +1,4 @@
-import { List } from 'immutable';
+import { List, Map } from 'immutable';
 import { get, escapeRegExp } from 'lodash';
 import consoleError from 'Lib/consoleError';
 import { CONFIG_SUCCESS } from 'Actions/config';
@@ -113,12 +113,35 @@ export const selectAllowDeletion = collection =>
 export const selectTemplateName = (collection, slug) =>
   selectors[collection.get('type')].templateName(collection, slug);
 export const selectIdentifier = collection => {
-  const identifier = collection.get('identifier_field');
+  const identifier = collection.get('identifier_field', '');
+
   const identifierFields = identifier ? [identifier, ...IDENTIFIER_FIELDS] : IDENTIFIER_FIELDS;
-  const fieldNames = collection.get('fields', []).map(field => field.get('name'));
-  return identifierFields.find(id =>
-    fieldNames.find(name => name.toLowerCase().trim() === id.toLowerCase().trim()),
-  );
+
+  const fields = collection.get('fields', []);//.map(field => field.get('name'));
+
+  return identifierFields.find(id => {
+    const segments = id.split('.');
+    // The `reduce()` returns a nested field array if it matches the segment name.
+    // This allows reduce to check if the next segment exists in the child's fields.
+    // Otherwise, it returns undefined, which will fail the indentifierField `find()`,
+    // causing it to fallback to use `title` or `path` by default.
+    return segments.reduce((_fields, segment, index, array) => {
+      const field = [..._fields].find(field => {
+        if (Map.isMap(field)) {
+          return field.get('name', '').toLowerCase().trim() === segment.toLowerCase().trim();
+        }
+        return false;
+      });
+
+      if (typeof field !== 'undefined') {
+        // If a matching field was found, and we're not at the last segment,
+        // we return the next depth of fields
+        return index + 1 === array.length ? true : field.get('fields', []);
+      }
+
+      return undefined;
+    }, fields);
+  });
 };
 export const selectInferedField = (collection, fieldName) => {
   if (fieldName === 'title' && collection.get('identifier_field')) {

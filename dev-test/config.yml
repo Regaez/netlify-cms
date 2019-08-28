@@ -89,6 +89,7 @@ collections: # A list of collections the CMS should be able to edit
     folder: '_sink'
     create: true
     summary: "{{object.nested.text}}"
+    identifier_field: "object.nested.text"
     fields:
       - label: 'Related Post'
         name: 'post'
