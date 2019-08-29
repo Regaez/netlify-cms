@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { Map } from 'immutable';
 import { selectInferedField } from 'Reducers/collections';
 
 // prepends a Zero if the date has only 1 digit
@@ -47,7 +48,7 @@ export function parseDateFromEntry(entry, collection, fieldName) {
 export function getDataByKey(key, data) {
   // Allows for retrieval of nested fields
   return key.split('.').reduce((_data, _key) => {
-    return typeof _data === 'object' ? _data.get(_key) : '';
+    return Map.isMap(_data) ? _data.get(_key) : '';
   }, data);
 }
 
